@@ -60,12 +60,17 @@ initial stream receive window size = int; (* The initial receive window size for
                                              new streams created on this
                                              transport, in bytes, before any
                                              window updates are sent. *)
+authority = string; (* Encodes the client's idea of the server's identity,
+                       typically used by the server for virtual hosting. If not
+                       present, servers should use their Android package name.
+                       *)
 
 setup transport transaction =
     version,
     binder,
     [protocol extension flags]
     [initial stream receive window size] (* if FLAG_STREAM_FLOW_CONTROL is set *)
+    [authority] (* if FLAG_AUTHORITY is set *)
     ;
 shutdown transport transaction = [shutdown flags];
 acknowledge bytes transaction = num bytes;
@@ -99,6 +104,11 @@ stream flow control aspect of this wire format. That is, it will respect its
 peer's stream flow control window as a sender and will produce stream window
 update messages as a receiver. Stream flow control will be enabled for the
 transport if and only if both client and server set this flag.
+
+*   FLAG_AUTHORITY (0x2) - Sent by a client to indicate that their setup
+transport Parcel contains the optional authority field. This string encodes the
+client's idea of the server's identity and is typically used for virtual
+hosting.
 
 ### Stream Transactions
 
